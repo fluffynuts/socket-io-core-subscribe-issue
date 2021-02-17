@@ -57,6 +57,8 @@ class Server {
                 client.emit("/consume", {
                     subscriptionId: sub.subscriptionId,
                     messages: [ data ]
+                }, result => {
+                    console.log("received ack to consume", result);
                 });
             });
             callback({ success: true });

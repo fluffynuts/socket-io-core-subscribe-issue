@@ -41,10 +41,15 @@ namespace SocketIoCoreTests
             });
             // Act
             await client.OpenAsync(new Uri("http://localhost:3300"));
-            var data = new Payload()
+            var data1 = new Payload()
             {
                 Id = 42,
                 Name = "Douglas Adams"
+            };
+            var data2 = new Payload()
+            {
+                Id = 86,
+                Name = "Carl Sagan"
             };
 
             while (clientId1 is null)
@@ -66,7 +71,10 @@ namespace SocketIoCoreTests
                     10,
                     0
                 )
-            ).Subscribe(ack => Log($"subscribe ack: {ack}"));
+            ).Subscribe(ack =>
+            {
+                Log($"subscribe ack: {ack}");
+            });
 
 
             Log("- about to publish - ");
@@ -74,7 +82,18 @@ namespace SocketIoCoreTests
                 {
                     Topic = "test",
                     Channel = 1,
-                    Message = JsonConvert.SerializeObject(data)
+                    Message = JsonConvert.SerializeObject(data1)
+                }
+            ).Subscribe(ack =>
+            {
+                Log($"publish ack: {JsonConvert.SerializeObject(ack)}");
+            });
+
+            client.Emit("/publish", new PublishRequest
+                {
+                    Topic = "test",
+                    Channel = 1,
+                    Message = JsonConvert.SerializeObject(data1)
                 }
             ).Subscribe(ack =>
             {
